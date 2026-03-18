@@ -431,7 +431,7 @@ app.post('/api/admin/reset-dealer', (req, res) => {
 //  START SERVER
 // ─────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n✅ Astral Voucher Portal running on port ${PORT}`);
   console.log(`   Landing page: http://localhost:${PORT}`);
   console.log(`   Admin panel:  http://localhost:${PORT}/admin.html\n`);
