@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Astral Voucher Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root { --blue:#1B3A6B; --orange:#E8621A; --bg:#F0F4FA; --white:#fff; --gray:#6B7280; --light:#E8EDF5; --success:#16A34A; --error:#DC2626; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); min-height:100vh; }
+  header { background:var(--blue); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; }
+  .logo { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:700; color:white; }
+  .logo span { color:var(--orange); }
+  .admin-badge { background:var(--orange); color:white; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; padding:4px 12px; border-radius:20px; }
+  main { max-width:900px; margin:0 auto; padding:28px 16px; }
+  h1 { font-family:'Rajdhani',sans-serif; font-size:28px; color:var(--blue); margin-bottom:6px; }
+  .subtitle { color:var(--gray); font-size:14px; margin-bottom:28px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+  @media(max-width:600px){ .grid{grid-template-columns:1fr;} }
+  .stat-card { background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+  .stat-val { font-family:'Rajdhani',sans-serif; font-size:36px; font-weight:700; color:var(--blue); }
+  .stat-label { font-size:12px; color:var(--gray); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+  .stat-card.orange .stat-val { color:var(--orange); }
+  .stat-card.green .stat-val { color:var(--success); }
+  .stat-card.red .stat-val { color:var(--error); }
+  .card { background:white; border-radius:12px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:20px; }
+  .card h2 { font-family:'Rajdhani',sans-serif; font-size:20px; color:var(--blue); margin-bottom:4px; }
+  .card p { font-size:13px; color:var(--gray); margin-bottom:16px; }
+  .upload-zone {
+    border:2px dashed var(--light);
+    border-radius:10px;
+    padding:28px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color 0.2s, background 0.2s;
+    margin-bottom:14px;
+  }
+  .upload-zone:hover { border-color:var(--orange); background:#FFF7ED; }
+  .upload-zone.dragover { border-color:var(--orange); background:#FFF7ED; }
+  .upload-zone input { display:none; }
+  .upload-icon { font-size:32px; margin-bottom:8px; }
+  .upload-zone .uz-text { font-size:14px; color:var(--gray); }
+  .upload-zone .uz-text strong { color:var(--blue); }
+  .upload-zone .file-chosen { font-size:13px; color:var(--success); font-weight:600; margin-top:6px; }
+  .btn { padding:12px 24px; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity 0.2s,transform 0.1s; }
+  .btn-primary { background:var(--orange); color:white; }
+  .btn-primary:hover { opacity:0.9; }
+  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
+  .btn-secondary { background:var(--light); color:var(--blue); }
+  .btn-success { background:var(--success); color:white; }
+  .notice { border-radius:8px; padding:12px 14px; font-size:13px; margin-top:12px; display:none; }
+  .notice.show { display:block; }
+  .notice.success { background:#DCFCE7; color:#166534; border:1px solid #86EFAC; }
+  .notice.error { background:#FEF2F2; color:var(--error); border:1px solid #FECACA; }
+  .notice.info { background:#EFF6FF; color:var(--blue); border:1px solid #BFDBFE; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { background:var(--blue); color:white; padding:10px 12px; text-align:left; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; }
+  td { padding:10px 12px; border-bottom:1px solid var(--light); }
+  tr:hover td { background:#FAFBFD; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .badge.redeemed { background:#DCFCE7; color:#166534; }
+  .badge.pending { background:#FEF3C7; color:#92400E; }
+  .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--light); }
+  .toggle-row:last-child { border-bottom:none; }
+  .toggle-label { font-weight:600; color:var(--blue); font-size:15px; }
+  .toggle-sub { font-size:12px; color:var(--gray); margin-top:2px; }
+  .toggle { position:relative; display:inline-block; width:46px; height:26px; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .slider { position:absolute; cursor:pointer; top:0;left:0;right:0;bottom:0; background:#ccc; border-radius:26px; transition:.3s; }
+  .slider:before { position:absolute; content:""; height:20px; width:20px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.3s; }
+  input:checked + .slider { background:var(--success); }
+  input:checked + .slider:before { transform:translateX(20px); }
+  .loader { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+  .format-hint { background:var(--light); border-radius:8px; padding:12px 14px; font-size:12px; color:var(--gray); margin-bottom:14px; line-height:1.6; }
+  .format-hint strong { color:var(--blue); }
+  .tabs { display:flex; gap:2px; margin-bottom:20px; background:var(--light); padding:4px; border-radius:10px; }
+  .tab { flex:1; padding:10px; text-align:center; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; color:var(--gray); transition:all 0.2s; border:none; background:none; font-family:'DM Sans',sans-serif; }
+  .tab.active { background:white; color:var(--blue); box-shadow:0 1px 4px rgba(0,0,0,0.1); }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">ASTRAL<span>.</span> Admin</div>
+  <div class="admin-badge">Admin Panel</div>
+</header>
+
+<main>
+  <h1>Voucher Portal Dashboard</h1>
+  <p class="subtitle">Manage dealer data, voucher codes, and campaign settings</p>
+
+  <!-- STATS -->
+  <div class="grid">
+    <div class="stat-card"><div class="stat-val" id="statTotal">—</div><div class="stat-label">Total Dealers</div></div>
+    <div class="stat-card green"><div class="stat-val" id="statRedeemed">—</div><div class="stat-label">Redeemed via OTP</div></div>
+    <div class="stat-card orange"><div class="stat-val" id="statPending">—</div><div class="stat-label">Yet to Redeem</div></div>
+    <div class="stat-card red"><div class="stat-val" id="statVouchers">—</div><div class="stat-label">Vouchers Remaining</div></div>
+  </div>
+  <!-- PROGRESS BAR -->
+  <div class="card" style="padding:18px 24px;margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-weight:600;color:var(--blue);font-size:14px;">Redemption Progress</span>
+      <span style="font-size:13px;color:var(--gray);" id="progressLabel">0 of 0 redeemed</span>
+    </div>
+    <div style="background:var(--light);border-radius:20px;height:12px;overflow:hidden;">
+      <div id="progressBar" style="height:100%;background:linear-gradient(90deg,var(--blue),var(--orange));border-radius:20px;width:0%;transition:width 0.6s ease;"></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('upload')">📤 Upload Data</button>
+    <button class="tab" onclick="switchTab('redemptions')">📋 Redemptions</button>
+    <button class="tab" onclick="switchTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <!-- TAB: UPLOAD -->
+  <div class="tab-panel active" id="tab-upload">
+
+    <!-- Dealer Upload -->
+    <div class="card">
+      <h2>Upload Dealer Master</h2>
+      <p>Upload the Excel file with all dealer details. System will validate before importing.</p>
+      <div class="format-hint">
+        <strong>Required columns (row 1 = header):</strong><br/>
+        <code>ALP Code</code> &nbsp;|&nbsp; <code>Mobile Number</code> &nbsp;|&nbsp; <code>Voucher Code</code><br/><br/>
+        One row per voucher code. If a dealer has 3 codes, they appear in 3 rows with the same ALP Code and Mobile Number.<br/>
+        Format: .xlsx or .xls only. Mobile numbers as text (10 digits, no country code).
+      </div>
+      <div class="upload-zone" id="dealerZone" onclick="document.getElementById('dealerFile').click()" ondragover="dragOver(event,'dealerZone')" ondragleave="dragLeave(event,'dealerZone')" ondrop="dropFile(event,'dealerZone','dealerFile')">
+        <input type="file" id="dealerFile" accept=".xlsx,.xls" onchange="fileChosen('dealerFile','dealerZone','dealerChosen')"/>
+        <div class="upload-icon">📊</div>
+        <div class="uz-text"><strong>Click to upload</strong> or drag & drop<br/>Dealer Master Excel (.xlsx)</div>
+        <div class="file-chosen" id="dealerChosen"></div>
+      </div>
+      <button class="btn btn-primary" id="dealerUploadBtn" onclick="uploadDealers()" disabled>Upload & Import Dealers</button>
+      <div class="notice" id="dealerNotice"></div>
+    </div>
+
+
+  </div>
+
+  <!-- TAB: REDEMPTIONS -->
+  <div class="tab-panel" id="tab-redemptions">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <h2>Dealer Voucher Status</h2>
+          <p style="margin:0">All dealers — assigned vouchers + redemption status</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="searchInput" placeholder="Search ALP / Mobile..." oninput="filterTable()" style="padding:8px 12px;border:1.5px solid var(--light);border-radius:8px;font-size:13px;width:200px;font-family:'DM Sans',sans-serif;outline:none;"/>
+          <button class="btn btn-success" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="redemptionTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>ALP Code</th>
+              <th>Mobile</th>
+              <th>Vouchers Assigned</th>
+              <th>Codes</th>
+              <th>Redeemed At</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="redemptionBody">
+            <tr><td colspan="7" style="text-align:center;color:var(--gray);padding:28px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SETTINGS -->
+  <div class="tab-panel" id="tab-settings">
+    <div class="card">
+      <h2>Campaign Settings</h2>
+      <p>Control the portal and manage campaign state</p>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Portal Active</div>
+          <div class="toggle-sub">When OFF, dealers see a "Campaign ended" message</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="portalToggle" onchange="togglePortal()" checked/><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Reset a Dealer</div>
+          <div class="toggle-sub">Clear redemption status for a specific ALP code (support use only)</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="resetAlp" placeholder="ALP Code" style="padding:8px 12px;border:1.5px solid var(--light);border-radius:8px;font-size:13px;width:140px;font-family:'DM Sans',sans-serif;outline:none;"/>
+          <button class="btn btn-secondary" onclick="resetDealer()">Reset</button>
+        </div>
+      </div>
+      <div class="notice" id="settingsNotice"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Tab switching
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    if (tab === 'redemptions') loadRedemptions();
+  }
+
+  // Drag and drop
+  function dragOver(e, zoneId) { e.preventDefault(); document.getElementById(zoneId).classList.add('dragover'); }
+  function dragLeave(e, zoneId) { document.getElementById(zoneId).classList.remove('dragover'); }
+  function dropFile(e, zoneId, inputId) {
+    e.preventDefault();
+    document.getElementById(zoneId).classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    const input = document.getElementById(inputId);
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    input.dispatchEvent(new Event('change'));
+  }
+
+  function fileChosen(inputId, zoneId, chosenId) {
+    const file = document.getElementById(inputId).files[0];
+    if (!file) return;
+    document.getElementById(chosenId).textContent = '✓ ' + file.name;
+    const btnMap = { dealerFile: 'dealerUploadBtn', voucherFile: 'voucherUploadBtn' };
+    document.getElementById(btnMap[inputId]).disabled = false;
+  }
+
+  function showNotice(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = `notice ${type} show`;
+    el.textContent = msg;
+  }
+
+  async function uploadDealers() {
+    const file = document.getElementById('dealerFile').files[0];
+    if (!file) return;
+    const btn = document.getElementById('dealerUploadBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loader"></span> Uploading & Validating...';
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await fetch('/api/admin/upload-dealers', { method:'POST', body:fd });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        showNotice('dealerNotice', 'success', `✓ ${data.imported} dealers imported (${data.totalRows} total rows processed). ${data.errors ? data.errors + ' rows skipped due to errors.' : 'No errors.'}`);
+        loadStats();
+      } else {
+        showNotice('dealerNotice', 'error', data.message || 'Upload failed. Check file format.');
+      }
+    } catch(e) { showNotice('dealerNotice', 'error', 'Network error. Please try again.'); }
+    btn.disabled = false;
+    btn.innerHTML = 'Upload & Import Dealers';
+  }
+
+  async function uploadVouchers() {
+    const file = document.getElementById('voucherFile').files[0];
+    if (!file) return;
+    const btn = document.getElementById('voucherUploadBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loader"></span> Uploading...';
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await fetch('/api/admin/upload-vouchers', { method:'POST', body:fd });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        showNotice('voucherNotice', 'success', `✓ ${data.imported} voucher codes imported successfully.`);
+        loadStats();
+      } else {
+        showNotice('voucherNotice', 'error', data.message || 'Upload failed.');
+      }
+    } catch(e) { showNotice('voucherNotice', 'error', 'Network error. Please try again.'); }
+    btn.disabled = false;
+    btn.innerHTML = 'Upload Voucher Pool';
+  }
+
+  let allRedemptions = [];
+
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/admin/stats');
+      const d = await res.json();
+      document.getElementById('statTotal').textContent = d.total || 0;
+      document.getElementById('statRedeemed').textContent = d.redeemed || 0;
+      document.getElementById('statPending').textContent = (d.total - d.redeemed) || 0;
+      document.getElementById('statVouchers').textContent = d.vouchersRemaining || 0;
+      // Progress bar
+      const pct = d.total > 0 ? Math.round((d.redeemed / d.total) * 100) : 0;
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent = `${d.redeemed} of ${d.total} redeemed (${pct}%)`;
+    } catch(e){}
+  }
+
+  async function loadRedemptions() {
+    try {
+      const res = await fetch('/api/admin/redemptions');
+      const data = await res.json();
+      allRedemptions = data.redemptions || [];
+      renderTable(allRedemptions);
+    } catch(e){}
+  }
+
+  function renderTable(rows) {
+    const tbody = document.getElementById('redemptionBody');
+    if (!rows || rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:28px;">No dealers loaded yet. Upload dealer Excel first.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map((r, i) => {
+      // Show assigned codes always; highlight redeemed ones
+      const assigned = (r.assignedCodes || []);
+      const codesHtml = assigned.length > 0
+        ? assigned.map(c => `<code style="background:${r.redeemed ? '#DCFCE7' : '#EFF6FF'};color:${r.redeemed ? '#166534' : 'var(--blue)'};padding:2px 8px;border-radius:4px;font-size:11px;margin:2px;display:inline-block;font-weight:600;">${c}</code>`).join(' ')
+        : '<span style="color:var(--gray);font-size:12px;">—</span>';
+      return `
+        <tr>
+          <td style="color:var(--gray);font-size:12px;">${i+1}</td>
+          <td><strong style="color:var(--blue);">${r.alpCode}</strong></td>
+          <td style="font-family:monospace;font-size:13px;">${r.mobile}</td>
+          <td style="text-align:center;">
+            <span style="background:var(--light);color:var(--blue);font-weight:700;padding:3px 12px;border-radius:20px;font-size:13px;">${assigned.length}</span>
+          </td>
+          <td>${codesHtml}</td>
+          <td style="font-size:12px;color:var(--gray);">${r.redeemedAt ? new Date(r.redeemedAt).toLocaleString('en-IN') : '—'}</td>
+          <td><span class="badge ${r.redeemed ? 'redeemed' : 'pending'}">${r.redeemed ? '✓ Redeemed' : 'Pending'}</span></td>
+        </tr>`;
+    }).join('');
+  }
+
+  function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    if (!q) { renderTable(allRedemptions); return; }
+    const filtered = allRedemptions.filter(r =>
+      (r.alpCode||'').toLowerCase().includes(q) ||
+      (r.mobile||'').includes(q)
+    );
+    renderTable(filtered);
+  }
+
+  async function exportCSV() {
+    window.location.href = '/api/admin/export-csv';
+  }
+
+  async function togglePortal() {
+    const active = document.getElementById('portalToggle').checked;
+    await fetch('/api/admin/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({portalActive: active}) });
+  }
+
+  async function resetDealer() {
+    const alp = document.getElementById('resetAlp').value.trim().toUpperCase();
+    if (!alp) return;
+    if (!confirm(`Reset redemption for ALP Code: ${alp}? This cannot be undone.`)) return;
+    try {
+      const res = await fetch('/api/admin/reset-dealer', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({alpCode:alp}) });
+      const data = await res.json();
+      if (data.status === 'ok') showNotice('settingsNotice', 'success', `✓ Dealer ${alp} has been reset. They can now redeem again.`);
+      else showNotice('settingsNotice', 'error', data.message || 'Reset failed.');
+    } catch(e) { showNotice('settingsNotice', 'error', 'Network error.'); }
+    document.getElementById('resetAlp').value = '';
+  }
+
+  loadStats();
+  setInterval(loadStats, 30000);
+</script>
+</body>
+</html>

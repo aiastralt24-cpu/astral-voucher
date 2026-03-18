@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Astral Dealer Voucher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --blue: #1B3A6B;
+    --orange: #E8621A;
+    --orange-light: #FF7A35;
+    --bg: #F0F4FA;
+    --white: #FFFFFF;
+    --gray: #6B7280;
+    --light: #E8EDF5;
+    --success: #16A34A;
+    --error: #DC2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--white);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  }
+  .logo-img {
+    height: 48px;
+    width: auto;
+    display: block;
+  }
+  .tagline {
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* HERO STRIP */
+  .hero {
+    background: linear-gradient(135deg, var(--blue) 0%, #0f2347 100%);
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(232,98,26,0.15);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -30px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--orange);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .hero h1 span { color: var(--orange); }
+  .hero p {
+    color: rgba(255,255,255,0.65);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* MAIN CARD */
+  main {
+    flex: 1;
+    padding: 24px 16px 40px;
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 24px rgba(27,58,107,0.10);
+  }
+  .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .card-sub {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 24px;
+  }
+
+  /* STEPS */
+  .steps {
+    display: flex;
+    gap: 0;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 16px; left: 16px; right: 16px;
+    height: 2px;
+    background: var(--light);
+    z-index: 0;
+  }
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .step-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    color: var(--gray);
+    transition: all 0.3s;
+  }
+  .step.active .step-dot {
+    background: var(--orange);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(232,98,26,0.15);
+  }
+  .step.done .step-dot {
+    background: var(--success);
+    color: white;
+  }
+  .step-label {
+    font-size: 10px;
+    color: var(--gray);
+    text-align: center;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .step.active .step-label { color: var(--orange); font-weight: 600; }
+  .step.done .step-label { color: var(--success); }
+
+  /* FORM */
+  .form-group { margin-bottom: 18px; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--light);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a1a;
+    background: #FAFBFD;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(232,98,26,0.1);
+    background: white;
+  }
+  input.error-input { border-color: var(--error); }
+
+  /* BUTTON */
+  .btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+    box-shadow: 0 4px 14px rgba(232,98,26,0.3);
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(232,98,26,0.35); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: var(--light);
+    color: var(--blue);
+    box-shadow: none;
+    font-size: 14px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .btn-secondary:hover { background: #dde4f0; box-shadow: none; }
+
+  /* ERROR / INFO */
+  .error-msg {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-left: 4px solid var(--error);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--error);
+    margin-bottom: 16px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  /* OTP SCREEN */
+  .otp-info {
+    background: #EFF6FF;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--blue);
+    line-height: 1.5;
+  }
+  .otp-info strong { display: block; margin-bottom: 4px; font-size: 14px; }
+  .otp-boxes {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .otp-box {
+    width: 46px; height: 54px;
+    border: 2px solid var(--light);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--blue);
+    background: #FAFBFD;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .otp-box:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(232,98,26,0.12);
+    background: white;
+  }
+  .otp-box.filled { border-color: var(--blue); background: white; }
+  .resend-row {
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray);
+    margin-top: 12px;
+  }
+  .resend-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--orange); font-weight: 600; font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: underline;
+    padding: 0;
+  }
+  .resend-btn:disabled { color: var(--gray); text-decoration: none; cursor: default; }
+
+  /* VOUCHER SCREEN */
+  .voucher-header {
+    text-align: center;
+    padding: 8px 0 20px;
+  }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: #DCFCE7;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 28px;
+  }
+  .voucher-header h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+  .voucher-header p { font-size: 13px; color: var(--gray); }
+  .save-nudge {
+    background: linear-gradient(135deg, #FFF7ED, #FFEDD5);
+    border: 1px solid #FED7AA;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #9A3412;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .save-nudge .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .voucher-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .voucher-card {
+    background: linear-gradient(135deg, var(--blue) 0%, #0f2347 100%);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .voucher-card::before {
+    content: '';
+    position: absolute;
+    right: -20px; top: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(232,98,26,0.2);
+  }
+  .voucher-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+  }
+  .voucher-code {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 2px;
+  }
+  .copy-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.25); }
+  .copy-btn.copied { background: var(--success); border-color: var(--success); }
+
+  /* ALREADY REDEEMED */
+  .redeemed-screen {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .redeemed-icon {
+    width: 64px; height: 64px;
+    background: #FEF2F2;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 28px;
+  }
+  .redeemed-screen h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    color: var(--error);
+    margin-bottom: 8px;
+  }
+  .redeemed-screen p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+
+  /* LOADER */
+  .loader {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SCREEN TRANSITIONS */
+  .screen { display: none; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 11px;
+    color: var(--gray);
+  }
+  footer strong { color: var(--blue); }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="/logo.png" alt="Astral Pipes" class="logo-img"/>
+  <div class="tagline">Dealer Voucher Portal</div>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">🎁 Exclusive Dealer Offer</div>
+  <h1>Claim Your <span>Voucher Codes</span></h1>
+  <p>Verify your dealer credentials to unlock<br/>your exclusive Astral voucher codes</p>
+</div>
+
+<main>
+  <div class="card">
+
+    <!-- STEP INDICATOR -->
+    <div class="steps" id="stepIndicator">
+      <div class="step active" id="step1">
+        <div class="step-dot">1</div>
+        <div class="step-label">Verify</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-dot">2</div>
+        <div class="step-label">OTP</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-dot">3</div>
+        <div class="step-label">Vouchers</div>
+      </div>
+    </div>
+
+    <!-- SCREEN 1: VERIFY FORM -->
+    <div class="screen active" id="screenVerify">
+      <div class="card-title">Enter Your Details</div>
+      <div class="card-sub">Enter your ALP code and registered mobile number</div>
+
+      <div class="error-msg" id="verifyError"></div>
+
+      <div class="form-group">
+        <label>ALP Dealer Code</label>
+        <input type="text" id="dealerAlp" placeholder="Your ALP code" autocomplete="off" style="text-transform:uppercase"/>
+      </div>
+      <div class="form-group">
+        <label>Registered Mobile Number</label>
+        <input type="tel" id="dealerMobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric"/>
+      </div>
+
+      <button class="btn" id="verifyBtn" onclick="submitVerify()">
+        Verify & Get OTP
+      </button>
+    </div>
+
+    <!-- SCREEN 2: OTP -->
+    <div class="screen" id="screenOtp">
+      <div class="card-title">Enter OTP</div>
+      <div class="card-sub">We've sent a 6-digit OTP to your mobile</div>
+
+      <div class="otp-info">
+        <strong>📱 OTP Sent!</strong>
+        Check SMS on <span id="otpMobileDisplay"></span> — valid for 10 minutes
+      </div>
+
+      <div class="error-msg" id="otpError"></div>
+
+      <div class="otp-boxes">
+        <input class="otp-box" type="tel" maxlength="1" inputmode="numeric" id="o1"/>
+        <input class="otp-box" type="tel" maxlength="1" inputmode="numeric" id="o2"/>
+        <input class="otp-box" type="tel" maxlength="1" inputmode="numeric" id="o3"/>
+        <input class="otp-box" type="tel" maxlength="1" inputmode="numeric" id="o4"/>
+        <input class="otp-box" type="tel" maxlength="1" inputmode="numeric" id="o5"/>
+        <input class="otp-box" type="tel" maxlength="1" inputmode="numeric" id="o6"/>
+      </div>
+
+      <button class="btn" id="otpBtn" onclick="submitOtp()">
+        Verify OTP & Get Vouchers
+      </button>
+
+      <div class="resend-row">
+        <span id="resendTimer">Resend OTP in <strong id="timerCount">60</strong>s</span>
+        <button class="resend-btn" id="resendBtn" disabled onclick="resendOtp()">Resend OTP</button>
+      </div>
+
+      <button class="btn btn-secondary" onclick="goBack()">← Change Details</button>
+    </div>
+
+    <!-- SCREEN 3: VOUCHERS -->
+    <div class="screen" id="screenVouchers">
+      <div class="voucher-header">
+        <div class="success-icon">🎉</div>
+        <h2>Your Vouchers Are Here!</h2>
+        <p>Congratulations! Here are your exclusive<br/>Astral voucher codes</p>
+      </div>
+
+      <div class="save-nudge">
+        <span class="icon">⚠️</span>
+        <span><strong>Save your codes now!</strong> Screenshot this page or note down the codes. These will not be sent via SMS and cannot be retrieved again.</span>
+      </div>
+
+      <div class="voucher-cards" id="voucherCards"></div>
+    </div>
+
+    <!-- SCREEN 4: ALREADY REDEEMED -->
+    <div class="screen" id="screenRedeemed">
+      <div class="redeemed-screen">
+        <div class="redeemed-icon">🔒</div>
+        <h2>Already Redeemed</h2>
+        <p>Your vouchers have already been claimed.<br/>Each dealer code can only be used once.<br/><br/>For help, contact your Astral sales representative.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 <strong>Astral Limited</strong>. All rights reserved. | Authorized Dealer Portal
+</footer>
+
+<script>
+  let sessionToken = null;
+  let resendCount = 0;
+  let timerInterval = null;
+
+  // OTP box auto-advance
+  document.querySelectorAll('.otp-box').forEach((box, i, boxes) => {
+    box.addEventListener('input', e => {
+      const val = e.target.value.replace(/\D/g, '');
+      e.target.value = val;
+      if (val && i < boxes.length - 1) boxes[i + 1].focus();
+      e.target.classList.toggle('filled', !!val);
+    });
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && i > 0) boxes[i - 1].focus();
+    });
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+      paste.split('').forEach((ch, j) => {
+        if (boxes[j]) { boxes[j].value = ch; boxes[j].classList.add('filled'); }
+      });
+      if (boxes[paste.length - 1]) boxes[Math.min(paste.length, 5)].focus();
+    });
+  });
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function setStep(n) {
+    [1,2,3].forEach(i => {
+      const el = document.getElementById('step' + i);
+      el.classList.remove('active', 'done');
+      if (i < n) el.classList.add('done');
+      else if (i === n) el.classList.add('active');
+    });
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function hideError(id) {
+    document.getElementById(id).classList.remove('show');
+  }
+
+  function setLoading(btnId, loading, text) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.innerHTML = loading ? `<span class="loader"></span> ${text}` : text;
+  }
+
+  async function submitVerify() {
+    hideError('verifyError');
+    const mobile = document.getElementById('dealerMobile').value.trim();
+    const alp = document.getElementById('dealerAlp').value.trim().toUpperCase();
+
+    if (!mobile || !alp) return showError('verifyError', 'Please fill in all fields.');
+    if (!/^\d{10}$/.test(mobile)) return showError('verifyError', 'Mobile number must be exactly 10 digits.');
+    if (mobile.startsWith('0')) return showError('verifyError', 'Enter mobile number without leading 0.');
+
+    setLoading('verifyBtn', true, 'Verifying...');
+    try {
+      const res = await fetch('/api/verify-dealer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, alpCode: alp })
+      });
+      const data = await res.json();
+      if (data.status === 'already_redeemed') {
+        showScreen('screenRedeemed');
+        document.getElementById('stepIndicator').style.display = 'none';
+      } else if (data.status === 'ok') {
+        document.getElementById('otpMobileDisplay').textContent = mobile.slice(0,2) + 'XXXXXX' + mobile.slice(-2);
+        setStep(2);
+        showScreen('screenOtp');
+        startResendTimer();
+      } else {
+        showError('verifyError', data.message || 'Details not found. Please check and try again.');
+      }
+    } catch(e) {
+      showError('verifyError', 'Network error. Please try again.');
+    }
+    setLoading('verifyBtn', false, 'Verify & Get OTP');
+  }
+
+  async function submitOtp() {
+    hideError('otpError');
+    const otp = [1,2,3,4,5,6].map(i => document.getElementById('o'+i).value).join('');
+    if (otp.length !== 6) return showError('otpError', 'Please enter the complete 6-digit OTP.');
+
+    setLoading('otpBtn', true, 'Verifying...');
+    try {
+      const mobile = document.getElementById('dealerMobile').value.trim();
+      const res = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, otp })
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        sessionToken = data.token;
+        clearInterval(timerInterval);
+        setStep(3);
+        showVouchers(data.vouchers);
+      } else {
+        showError('otpError', data.message || 'Invalid OTP. Please try again.');
+        [1,2,3,4,5,6].forEach(i => { document.getElementById('o'+i).value = ''; document.getElementById('o'+i).classList.remove('filled'); });
+        document.getElementById('o1').focus();
+      }
+    } catch(e) {
+      showError('otpError', 'Network error. Please try again.');
+    }
+    setLoading('otpBtn', false, 'Verify OTP & Get Vouchers');
+  }
+
+  async function resendOtp() {
+    if (resendCount >= 3) return;
+    resendCount++;
+    document.getElementById('resendBtn').disabled = true;
+    try {
+      const mobile = document.getElementById('dealerMobile').value.trim();
+      const alp = document.getElementById('dealerAlp').value.trim().toUpperCase();
+      await fetch('/api/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, alpCode: alp })
+      });
+      startResendTimer();
+    } catch(e) {}
+  }
+
+  function startResendTimer() {
+    clearInterval(timerInterval);
+    let secs = 60;
+    const timerEl = document.getElementById('timerCount');
+    const timerRow = document.getElementById('resendTimer');
+    const resendBtn = document.getElementById('resendBtn');
+    timerRow.style.display = 'inline';
+    resendBtn.style.display = 'none';
+    timerEl.textContent = secs;
+    timerInterval = setInterval(() => {
+      secs--;
+      timerEl.textContent = secs;
+      if (secs <= 0) {
+        clearInterval(timerInterval);
+        timerRow.style.display = 'none';
+        if (resendCount < 3) {
+          resendBtn.style.display = 'inline';
+          resendBtn.disabled = false;
+          resendBtn.textContent = resendCount >= 2 ? 'Resend OTP (last attempt)' : 'Resend OTP';
+        } else {
+          resendBtn.style.display = 'inline';
+          resendBtn.disabled = true;
+          resendBtn.textContent = 'Max resends reached';
+        }
+      }
+    }, 1000);
+  }
+
+  function showVouchers(vouchers) {
+    const container = document.getElementById('voucherCards');
+    container.innerHTML = '';
+    vouchers.forEach((code, i) => {
+      container.innerHTML += `
+        <div class="voucher-card">
+          <div>
+            <div class="voucher-label">Voucher Code ${i+1}</div>
+            <div class="voucher-code">${code}</div>
+          </div>
+          <button class="copy-btn" onclick="copyCode(this, '${code}')">Copy</button>
+        </div>`;
+    });
+    showScreen('screenVouchers');
+  }
+
+  function copyCode(btn, code) {
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = code; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function goBack() {
+    clearInterval(timerInterval);
+    hideError('otpError');
+    [1,2,3,4,5,6].forEach(i => { document.getElementById('o'+i).value = ''; document.getElementById('o'+i).classList.remove('filled'); });
+    setStep(1);
+    showScreen('screenVerify');
+  }
+</script>
+</body>
+</html>
