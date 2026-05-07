@@ -7,9 +7,13 @@ const crypto = require('crypto');
 const https = require('https');
 
 const app = express();
+const PUBLIC_DIR = path.join(__dirname, 'public');
 
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(PUBLIC_DIR));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+});
 
 // ─────────────────────────────────────────
 //  DATA STORE (JSON files — no DB needed)
