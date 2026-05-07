@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const https = require('https');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -16,9 +15,15 @@ app.use(express.static('public'));
 //  DATA STORE (JSON files — no DB needed)
 //  For production scale, swap with PostgreSQL
 // ─────────────────────────────────────────
-const DATA_DIR = './data';
+const isVercel = Boolean(process.env.VERCEL);
+const WRITABLE_ROOT = isVercel ? '/tmp' : __dirname;
+const DATA_DIR = path.join(WRITABLE_ROOT, 'data');
+const UPLOADS_DIR = path.join(WRITABLE_ROOT, 'uploads');
+
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
-if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR);
+
+const upload = multer({ dest: UPLOADS_DIR });
 
 const DEALERS_FILE = path.join(DATA_DIR, 'dealers.json');
 const VOUCHERS_FILE = path.join(DATA_DIR, 'vouchers.json');
@@ -431,8 +436,12 @@ app.post('/api/admin/reset-dealer', (req, res) => {
 //  START SERVER
 // ─────────────────────────────────────────
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n✅ Astral Voucher Portal running on port ${PORT}`);
-  console.log(`   Landing page: http://localhost:${PORT}`);
-  console.log(`   Admin panel:  http://localhost:${PORT}/admin.html\n`);
-});
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`\n✅ Astral Voucher Portal running on port ${PORT}`);
+    console.log(`   Landing page: http://localhost:${PORT}`);
+    console.log(`   Admin panel:  http://localhost:${PORT}/admin.html\n`);
+  });
+}
+
+module.exports = app;
